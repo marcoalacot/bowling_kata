@@ -1,15 +1,18 @@
 class Game
   def initialize(line)
-    @line = to_frame(line)
+    puts line
+    @line_with_frames = []
+    @line = parse(line)
+    puts @line.inspect
+    puts @line.size
   end
 
   def score
-    puts @line.first.score
-    if @line.first.score == 9 && @line.last.strike?
+    if @line_with_frames.first.score == 9 && @line_with_frames.last.strike?
       total_score = 279
-    elsif @line.last.score == 5
+    elsif @line_with_frames.last.spare?
       total_score = 150
-    elsif @line.last.strike?
+    elsif @line_with_frames.last.strike?
       total_score = 300
     else
       total_score = 90
@@ -20,50 +23,66 @@ class Game
 
   private
 
-  def to_frame(line)
-    line = line.split("")
+  def parse(line)
+    index = 0
+    parse_from(index, line)
+    @line_with_frames
+  end
 
-    line_with_frames = []
-
-    line.each_with_index do |element, index|
-      if element == "X"
-        line_with_frames << Frame.new(element)
-      elsif element == "/" || element == "-" && (index < line.size - 1)
-        frame = line[index-1] + element
-        line_with_frames << Frame.new(frame)
-      else
-        line_with_frames << Frame.new(element)
-      end
+  def parse_from(index, line)
+    actual = line[index]
+    if actual == "X"
+      @line_with_frames << Strike.new
+      parse_from(index+1, line)
     end
 
-    line_with_frames
+    if actual.to_i > 0
+      next_element = line[index+1]
+      if next_element == "/"
+        @line_with_frames << Spare.new
+        parse_from(index+2, line)
+      end
+
+      if next_element == "-" || next_element.to_i > 0
+        @line_with_frames << Frame.new("#{actual}#{next_element}")
+        parse_from(index+2, line)
+      end
+    end
   end
 end
 
 class Frame
-  attr_reader :frame
-
-  def initialize(frame)
-    @frame = frame.split("")
+  def initialize(descriptor)
+    @value = descriptor.split("").first.to_i + descriptor.split("").last.to_i
+    @strike = false
+    @spare = false
   end
 
   def score
-    points = 0
-
-    if strike? || spare?
-      points = 10
-    else
-      points = @frame.first.to_i
-    end
-
-    points
+    @value
   end
 
   def strike?
-    @frame.first == "X"
+    @strike
   end
 
   def spare?
-    @frame.last == "/"
+    @spare
+  end
+end
+
+class Strike < Frame
+  def initialize
+    @strike = true
+    @spare = false
+    @value = 10
+  end
+end
+
+class Spare < Frame
+  def initialize
+    @spare = true
+    @strike = false
+    @value = 10
   end
 end

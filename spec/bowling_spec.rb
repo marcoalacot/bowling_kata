@@ -32,36 +32,34 @@ end
 
 describe Frame do
   it "knows it's score" do
-    frame = Frame.new("X")
+    frame = Strike.new
 
     expect(frame.score).to eq(10)
 
-    frame = Frame.new("9-")
+    frame = Spare.new
 
-    expect(frame.score).to eq(9)
+    expect(frame.score).to eq(10)
 
     frame = Frame.new("5/")
 
-    expect(frame.score).to eq(10)
+    expect(frame.score).to eq(5)
+
+    frame = Frame.new("53")
+
+    expect(frame.score).to eq(8)
   end
 
   it "knows if it's a strike" do
-    frame = Frame.new("X")
+    frame = Strike.new
 
     expect(frame.strike?).to eq(true)
-
-    frame = Frame.new("9/")
-
-    expect(frame.strike?).to eq(false)
+    expect(frame.spare?).to eq(false)
   end
 
   it "knows if it's a spare" do
-    frame = Frame.new("4/")
+    frame = Spare.new
 
+    expect(frame.strike?).to eq(false)
     expect(frame.spare?).to eq(true)
-
-    frame = Frame.new("X")
-
-    expect(frame.spare?).to eq(false)
   end
 end
