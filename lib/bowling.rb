@@ -1,10 +1,11 @@
 class Game
+  STRIKE = "X"
+  SPARE = "/"
+  MISS = "-"
+
   def initialize(line)
-    puts line
     @line_with_frames = []
     @line = parse(line)
-    puts @line.inspect
-    puts @line.size
   end
 
   def score
@@ -31,23 +32,37 @@ class Game
 
   def parse_from(index, line)
     actual = line[index]
-    if actual == "X"
-      @line_with_frames << Strike.new
-      parse_from(index+1, line)
+
+    if actual == STRIKE
+      parse_strike(actual, index, line)
     end
 
     if actual.to_i > 0
       next_element = line[index+1]
-      if next_element == "/"
-        @line_with_frames << Spare.new
-        parse_from(index+2, line)
+
+      if next_element == SPARE
+        parse_spare(next_element, line, index)
       end
 
-      if next_element == "-" || next_element.to_i > 0
-        @line_with_frames << Frame.new("#{actual}#{next_element}")
-        parse_from(index+2, line)
+      if next_element == MISS || next_element.to_i > 0
+        parse_miss(next_element, line, index, actual)
       end
     end
+  end
+
+  def parse_spare(element, line, index)
+    @line_with_frames << Spare.new
+    parse_from(index+2, line)
+  end
+
+  def parse_miss(element, line, index, actual)
+    @line_with_frames << Frame.new("#{actual}#{element}")
+    parse_from(index+2, line)
+  end
+
+  def parse_strike(actual, index, line)
+    @line_with_frames << Strike.new
+    parse_from(index+1, line)
   end
 end
 
