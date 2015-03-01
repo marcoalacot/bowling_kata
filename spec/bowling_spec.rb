@@ -63,3 +63,40 @@ describe Frame do
     expect(frame.spare?).to eq(true)
   end
 end
+
+describe Scoreboard do
+  it "parses a line and returns an array with the scores" do
+    rolls = "XXX"
+    strike = Strike.new
+    allow(Strike).to receive(:new).and_return(strike)
+
+    scoreboard = Scoreboard.new(rolls)
+    expect(scoreboard.score).to eq([strike, strike, strike])
+  end
+
+  it "parses a line and returns an array with the scores" do
+    rolls = "X5/XX"
+    strike = Strike.new
+    spare = Spare.new
+
+    allow(Strike).to receive(:new).and_return(strike)
+    allow(Spare).to receive(:new).and_return(spare)
+
+    scoreboard = Scoreboard.new(rolls)
+    expect(scoreboard.score).to eq([strike, spare, strike, strike])
+  end
+
+  it "parses a line and returns an array with the scores" do
+    rolls = "X5/4-5/5"
+    strike = Strike.new
+    spare = Spare.new
+    frame = Frame.new("4-")
+
+    allow(Strike).to receive(:new).and_return(strike)
+    allow(Spare).to receive(:new).and_return(spare)
+    allow(Frame).to receive(:new).and_return(frame)
+
+    scoreboard = Scoreboard.new(rolls)
+    expect(scoreboard.score).to eq([strike, spare, frame, spare, frame])
+  end
+end

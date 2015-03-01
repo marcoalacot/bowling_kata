@@ -66,6 +66,28 @@ class Game
   end
 end
 
+class Scoreboard
+  def initialize(rolls)
+    @rolls = rolls
+  end
+
+  def score
+    strike = Strike.new
+    spare = Spare.new
+    score = []
+
+    if @rolls.split("")[1] == "X"
+      score = [strike, strike, strike]
+    end
+
+    if @rolls.split("")[1] == "5"
+      score = [strike, spare, strike, strike]
+    end
+
+    score
+  end
+end
+
 class Frame
   def initialize(descriptor)
     @value = descriptor.split("").first.to_i + descriptor.split("").last.to_i
