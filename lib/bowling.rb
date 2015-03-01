@@ -1,25 +1,57 @@
 class Game
+  def initialize(line)
+    @line_with_frames = Scoreboard.new(line).score
+  end
+
+  def score
+    calculate_score
+  end
+
+  private
+
+  def calculate_score
+    score = 0
+
+    @line_with_frames.each_with_index do |frame, index|
+      puts score
+      if frame.strike?
+        score += 10
+        if (index + 1) <= 10
+          score += @line_with_frames[index+1].score
+        end
+        if (index + 2) <= 10
+          score += @line_with_frames[index+2].score
+        end
+      end
+
+      if frame.spare?
+        score += 10
+        if (index + 1) < 10
+          score += @line_with_frames[index+1].score
+        end
+      end
+
+      if !frame.spare? && !frame.strike?
+        score += frame.score
+      end
+    end
+
+    score
+  end
+end
+
+class Scoreboard
   STRIKE = "X"
   SPARE = "/"
   MISS = "-"
 
-  def initialize(line)
+  def initialize(rolls)
     @line_with_frames = []
-    @line = parse(line)
+    @rolls = parse(rolls)
   end
 
   def score
-    if @line_with_frames.first.score == 9 && @line_with_frames.last.strike?
-      total_score = 279
-    elsif @line_with_frames.last.spare?
-      total_score = 150
-    elsif @line_with_frames.last.strike?
-      total_score = 300
-    else
-      total_score = 90
-    end
-
-    total_score
+    @rolls
   end
 
   private
@@ -38,6 +70,11 @@ class Game
     end
 
     if actual.to_i > 0
+      if last_element?(index, line)
+        parse_last_element(index, line)
+        return
+      end
+
       next_element = line[index+1]
 
       if next_element == SPARE
@@ -48,6 +85,10 @@ class Game
         parse_miss(next_element, line, index, actual)
       end
     end
+  end
+
+  def last_element?(index, line)
+    index == line.size-1
   end
 
   def parse_spare(element, line, index)
@@ -64,33 +105,15 @@ class Game
     @line_with_frames << Strike.new
     parse_from(index+1, line)
   end
-end
 
-class Scoreboard
-  def initialize(rolls)
-    @rolls = rolls
-  end
-
-  def score
-    strike = Strike.new
-    spare = Spare.new
-    score = []
-
-    if @rolls.split("")[1] == "X"
-      score = [strike, strike, strike]
-    end
-
-    if @rolls.split("")[1] == "5"
-      score = [strike, spare, strike, strike]
-    end
-
-    score
+  def parse_last_element(index, line)
+    @line_with_frames << Frame.new("#{line[index]}")
   end
 end
 
 class Frame
   def initialize(descriptor)
-    @value = descriptor.split("").first.to_i + descriptor.split("").last.to_i
+    @value = sum_descriptor_value(descriptor)
     @strike = false
     @spare = false
   end
@@ -105,6 +128,14 @@ class Frame
 
   def spare?
     @spare
+  end
+
+  private
+
+  def sum_descriptor_value(descriptor)
+    descriptor_elements = descriptor.split("")
+
+    descriptor_elements.map(&:to_i).reduce(:+)
   end
 end
 

@@ -99,4 +99,18 @@ describe Scoreboard do
     scoreboard = Scoreboard.new(rolls)
     expect(scoreboard.score).to eq([strike, spare, frame, spare, frame])
   end
+
+  it "parses a line and returns an array with the scores" do
+    rolls = "X5/4-9-"
+    strike = Strike.new
+    spare = Spare.new
+    frame = Frame.new("4-")
+
+    allow(Strike).to receive(:new).and_return(strike)
+    allow(Spare).to receive(:new).and_return(spare)
+    allow(Frame).to receive(:new).and_return(frame)
+
+    scoreboard = Scoreboard.new(rolls)
+    expect(scoreboard.score).to eq([strike, spare, frame, frame])
+  end
 end
