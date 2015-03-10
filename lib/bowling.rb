@@ -12,27 +12,28 @@ class Game
   def calculate_score
     score = 0
 
+    puts @line_with_frames.size
     @line_with_frames.each_with_index do |frame, index|
       puts score
       if frame.strike?
         score += 10
-        if (index + 1) <= 10
-          score += @line_with_frames[index+1].score
+        if (index + 1) < 10
+          score += @line_with_frames[index+1].descriptor_value
         end
-        if (index + 2) <= 10
-          score += @line_with_frames[index+2].score
+        if (index + 2) < 9
+          score += @line_with_frames[index+2].descriptor_value
         end
       end
 
       if frame.spare?
         score += 10
-        if (index + 1) < 10
-          score += @line_with_frames[index+1].score
+        if (index + 1) < 9
+          score += @line_with_frames[index+1].descriptor_value
         end
       end
 
       if !frame.spare? && !frame.strike?
-        score += frame.score
+        score += frame.descriptor_value
       end
     end
 
@@ -78,7 +79,7 @@ class Scoreboard
       next_element = line[index+1]
 
       if next_element == SPARE
-        parse_spare(next_element, line, index)
+        parse_spare(next_element, line, index, actual)
       end
 
       if next_element == MISS || next_element.to_i > 0
@@ -91,8 +92,8 @@ class Scoreboard
     index == line.size-1
   end
 
-  def parse_spare(element, line, index)
-    @line_with_frames << Spare.new
+  def parse_spare(element, line, index, actual)
+    @line_with_frames << Spare.new("#{actual}#{element}")
     parse_from(index+2, line)
   end
 
@@ -130,6 +131,10 @@ class Frame
     @spare
   end
 
+  def descriptor_value
+    score
+  end
+
   private
 
   def sum_descriptor_value(descriptor)
@@ -148,9 +153,14 @@ class Strike < Frame
 end
 
 class Spare < Frame
-  def initialize
+  def initialize(descriptor)
     @spare = true
     @strike = false
     @value = 10
+    @descriptor = descriptor
+  end
+
+  def descriptor_value
+    sum_descriptor_value(@descriptor)
   end
 end

@@ -36,7 +36,7 @@ describe Frame do
 
     expect(frame.score).to eq(10)
 
-    frame = Spare.new
+    frame = Spare.new("5/")
 
     expect(frame.score).to eq(10)
 
@@ -57,7 +57,7 @@ describe Frame do
   end
 
   it "knows if it's a spare" do
-    frame = Spare.new
+    frame = Spare.new("5/")
 
     expect(frame.strike?).to eq(false)
     expect(frame.spare?).to eq(true)
@@ -77,7 +77,7 @@ describe Scoreboard do
   it "parses a line and returns an array with the scores" do
     rolls = "X5/XX"
     strike = Strike.new
-    spare = Spare.new
+    spare = Spare.new("5/")
 
     allow(Strike).to receive(:new).and_return(strike)
     allow(Spare).to receive(:new).and_return(spare)
@@ -89,7 +89,7 @@ describe Scoreboard do
   it "parses a line and returns an array with the scores" do
     rolls = "X5/4-5/5"
     strike = Strike.new
-    spare = Spare.new
+    spare = Spare.new("5/")
     frame = Frame.new("4-")
 
     allow(Strike).to receive(:new).and_return(strike)
@@ -103,7 +103,7 @@ describe Scoreboard do
   it "parses a line and returns an array with the scores" do
     rolls = "X5/4-9-"
     strike = Strike.new
-    spare = Spare.new
+    spare = Spare.new("5/")
     frame = Frame.new("4-")
 
     allow(Strike).to receive(:new).and_return(strike)
