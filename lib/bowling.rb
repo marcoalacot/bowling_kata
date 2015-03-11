@@ -18,18 +18,15 @@ class Game
       break if last_frame?(index)
 
       if frame.strike?
-        score += 10
-        score += @line_with_frames[index+1].descriptor_value
-        score += @line_with_frames[index+2].descriptor_value
+        score += strike_score(index)
       end
 
       if frame.spare?
-        score += 10
-        score += @line_with_frames[index+1].descriptor_value
+        score += spare_score(index)
       end
 
       if !frame.spare? && !frame.strike?
-        score += frame.descriptor_value
+        score += miss_score(frame)
       end
     end
 
@@ -38,6 +35,27 @@ class Game
 
   def last_frame?(index)
     index == FRAMES
+  end
+
+  def strike_score(index)
+    score = 0
+
+    score += 10
+    score += @line_with_frames[index+1].descriptor_value
+    score += @line_with_frames[index+2].descriptor_value
+  end
+
+  def spare_score(index)
+    score = 0
+
+    score += 10
+    score += @line_with_frames[index+1].descriptor_value
+  end
+
+  def miss_score(frame)
+    score = 0
+
+    score += frame.descriptor_value
   end
 end
 
