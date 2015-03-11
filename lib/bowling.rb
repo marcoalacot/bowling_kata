@@ -1,4 +1,6 @@
 class Game
+  FRAMES = 10
+
   def initialize(line)
     @line_with_frames = Scoreboard.new(line).score
   end
@@ -12,24 +14,18 @@ class Game
   def calculate_score
     score = 0
 
-    puts @line_with_frames.size
     @line_with_frames.each_with_index do |frame, index|
-      puts score
+      break if last_frame?(index)
+
       if frame.strike?
         score += 10
-        if (index + 1) < 10
-          score += @line_with_frames[index+1].descriptor_value
-        end
-        if (index + 2) < 9
-          score += @line_with_frames[index+2].descriptor_value
-        end
+        score += @line_with_frames[index+1].descriptor_value
+        score += @line_with_frames[index+2].descriptor_value
       end
 
       if frame.spare?
         score += 10
-        if (index + 1) < 9
-          score += @line_with_frames[index+1].descriptor_value
-        end
+        score += @line_with_frames[index+1].descriptor_value
       end
 
       if !frame.spare? && !frame.strike?
@@ -38,6 +34,10 @@ class Game
     end
 
     score
+  end
+
+  def last_frame?(index)
+    index == FRAMES
   end
 end
 
